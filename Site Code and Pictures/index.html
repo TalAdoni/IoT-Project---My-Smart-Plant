@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Smart Plant</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #plantImg {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      background: #000;
+      display: block;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.88);
+      color: #111;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      min-width: 180px;
+      line-height: 1.25;
+      user-select: none;
+    }
+
+    #overlay .title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    #overlay .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    #overlay .muted {
+      color: #444;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    #statusBar {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 12px;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <img id="plantImg" src="images/finished_picture_0.jpg" alt="Plant image" />
+
+  <div id="overlay">
+    <div class="title">My Smart Plant</div>
+    <div class="row"><div>Soil</div><div><b id="waterPct">--%</b></div></div>
+    <div class="row"><div>Temperature</div><div><b id="temp">--</b> °C</div></div>
+    <div class="row"><div>Humidity</div><div><b id="hum">--</b> %</div></div>
+    <div class="muted" id="ts">--</div>
+  </div>
+
+  <div id="statusBar">Loading...</div>
+
+  <script>
+    const LATEST_URL = "telemetry/latest.json";
+    const IMAGES_PREFIX = "images/";
+
+    function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+    // Returns: images/finished_picture_0.jpg ... images/finished_picture_100.jpg
+    function pickPlantImage(waterPct){
+      const n = Number(waterPct);
+      const clamped = clamp(isFinite(n) ? n : 0, 0, 100);
+      const rounded5 = Math.round(clamped / 5) * 5; // 0,5,10,...,100
+      return `${IMAGES_PREFIX}finished_picture_${rounded5}.jpg`;
+    }
+
+    async function loadLatest(){
+      const statusBar = document.getElementById("statusBar");
+      const imgEl = document.getElementById("plantImg");
+
+      statusBar.textContent = "Loading...";
+
+      try{
+        const r = await fetch(`${LATEST_URL}?v=${Date.now()}`, { cache: "no-store" });
+        if(!r.ok) throw new Error("HTTP " + r.status);
+        const j = await r.json();
+
+        const soilRaw = Number(j.soilRaw ?? j.soil ?? j.rawSoil ?? NaN);
+        const isDisconnected = isFinite(soilRaw) && soilRaw < 700;
+
+        const water = Number(j.wateringPct ?? j.wateringPcnt ?? j.wateringPercent ?? 0);
+        const temp  = Number(j.tempC ?? j.temperature ?? 0);
+        const hum   = Number(j.humRH ?? j.humidity ?? 0);
+
+        // If sensor looks disconnected -> show "--%" and disconnected image
+        document.getElementById("waterPct").textContent =
+          isDisconnected ? "--%" : (isFinite(water) ? (water.toFixed(0) + "%") : "--%");
+
+        document.getElementById("temp").textContent     = isFinite(temp)  ? temp.toFixed(1) : "--";
+        document.getElementById("hum").textContent      = isFinite(hum)   ? hum.toFixed(1)  : "--";
+        document.getElementById("ts").textContent       = j.timestamp || j.ts || j.time || "--";
+
+        const imgPath = isDisconnected
+          ? `${IMAGES_PREFIX}disconnected.png`
+          : pickPlantImage(water);
+
+        // quick existence check so you get a clear message if a key is wrong
+        const test = new Image();
+
+        test.onload = () => {
+          imgEl.src = `${imgPath}?v=${Date.now()}`; // avoid cache
+          imgEl.alt = `Plant image at ${Math.round(clamp(water,0,100)/5)*5}%`;
+          statusBar.textContent = "Updated.";
+        };
+        test.onerror = () => {
+          statusBar.textContent = `Image not found: ${imgPath}`;
+        };
+        test.src = `${imgPath}?v=${Date.now()}`;
+
+      }catch(e){
+        statusBar.textContent = "Failed to load telemetry/latest.json: " + e.message;
+      }
+    }
+
+    loadLatest(); // refresh once when opening the page
+  </script>
+</body>
+</html>

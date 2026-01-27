@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Plants Data</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #333;
+            --text-light: #666;
+            --accent-p1: #2e7d32; /* Green for Plant 1 */
+            --accent-p2: #1565c0; /* Blue for Plant 2 */
+            --alert-color: #d32f2f;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+        }
+        h1 { text-align: center; margin-bottom: 30px; }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .p1-header { background-color: var(--accent-p1); }
+        .p2-header { background-color: var(--accent-p2); }
+
+        .card-body { padding: 20px; }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .metric-row:last-child { border-bottom: none; }
+
+        .label { font-weight: 500; color: var(--text-light); }
+        .value { font-weight: bold; font-size: 1.1rem; }
+
+                .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .status-OK { background-color: #e8f5e9; color: #2e7d32; }
+
+        /* THIRSTY -> RED */
+        .status-THIRSTY { background-color: #ffebee; color: #c62828; }
+
+        /* NEEDS WATER (no underscore) -> ORANGE */
+        .status-NEEDS\ WATER { background-color: #fff3e0; color: #ef6c00; }
+
+        /* DISCONNECTED -> RED + strong */
+        .status-DISCONNECTED { background-color: #ffebee; color: #d32f2f; }
+
+        /* DRY -> stronger red */
+        .status-DRY { background-color: #ffebee; color: #b71c1c; }
+
+        .status-UNKNOWN { background-color: #eceff1; color: #607d8b; }
+
+
+
+        .footer {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        .error-msg {
+            color: var(--alert-color);
+            font-size: 0.9rem;
+            display: none; /* Hidden by default */
+            margin-top: 5px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <h1>🌱 All Plants Data</h1>
+
+    <div class="container">
+        <div class="card" id="card-plant1">
+            <div class="card-header p1-header">
+                <span>Plant 1</span>
+                <div class="spinner" id="spinner-plant1"></div>
+            </div>
+            <div class="card-body">
+                <div class="metric-row">
+                    <span class="label">Temperature</span>
+                    <span class="value" id="p1-temp">--</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Humidity</span>
+                    <span class="value" id="p1-hum">--</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Soil Moisture</span>
+                    <span class="value" id="p1-water">--</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Status</span>
+                    <span class="status-badge status-UNKNOWN" id="p1-state">UNKNOWN</span>
+                </div>
+                <div class="footer">
+                    Last Cloud Update: <span id="p1-time">--</span>
+                    <div class="error-msg" id="p1-error">Fetch Failed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="card-plant2">
+            <div class="card-header p2-header">
+                <span>Plant 2</span>
+                <div class="spinner" id="spinner-plant2"></div>
+            </div>
+            <div class="card-body">
+                <div class="metric-row">
+                    <span class="label">Temperature</span>
+                    <span class="value" id="p2-temp">--</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Humidity</span>
+                    <span class="value" id="p2-hum">--</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Soil Moisture</span>
+                    <span class="value" id="p2-water">--</span>
+                </div>
+                <div class="metric-row">
+                    <span class="label">Status</span>
+                    <span class="status-badge status-UNKNOWN" id="p2-state">UNKNOWN</span>
+                </div>
+                <div class="footer">
+                    Last Cloud Update: <span id="p2-time">--</span>
+                    <div class="error-msg" id="p2-error">Fetch Failed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION
+        const REFRESH_INTERVAL_MS = 15000; // 15 seconds
+        
+        const URL_P1 = '/plant1/telemetry/latest.json';
+        const URL_P2 = '/plant2/telemetry/latest.json';
+
+        function updateUI(plantId, data, error = null) {
+            const prefix = plantId === 'plant1' ? 'p1' : 'p2';
+            const spinner = document.getElementById(`spinner-${plantId}`);
+            const errorMsg = document.getElementById(`${prefix}-error`);
+            
+            spinner.style.display = 'none';
+
+            if (error) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = error;
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+            
+            // Update fields (Temperature, Humidity, Moisture)
+            document.getElementById(`${prefix}-temp`).innerText = (data.tempC !== undefined && data.tempC !== null) ? `${data.tempC} °C` : 'N/A';
+            document.getElementById(`${prefix}-hum`).innerText = (data.humRH !== undefined && data.humRH !== null) ? `${data.humRH} %` : 'N/A';
+            
+                        // Keep original moisture value for display
+            const rawWater = data.wateringPct;
+
+            // Detect sensor disconnection by raw ADC threshold
+            const soilRaw = (data.soilRaw !== undefined && data.soilRaw !== null) ? Number(data.soilRaw) : NaN;
+            const isDisconnected = Number.isFinite(soilRaw) && soilRaw < 700;
+
+            // Soil display: show "--%" when disconnected
+            document.getElementById(`${prefix}-water`).innerText =
+                isDisconnected ? '--%' :
+                ((rawWater !== undefined && rawWater !== null) ? `${rawWater}%` : 'N/A');
+            
+                        // --- STATE CALCULATION LOGIC (derived ONLY from website data) ---
+
+            // Default (when data is missing / invalid)
+            let finalState = 'UNKNOWN';
+
+            // 1) DISCONNECTED has top priority (keeps previous behavior)
+            if (isDisconnected) {
+                finalState = 'DISCONNECTED';
+            } else {
+                // 2) Derive state from wateringPct only (if valid)
+                const moistureVal = (rawWater !== undefined && rawWater !== null) ? Number(rawWater) : NaN;
+
+                if (Number.isFinite(moistureVal)) {
+                    if (moistureVal < 10) {
+                        finalState = 'DRY';
+                    } else if (moistureVal < 30) {
+                        finalState = 'NEEDS WATER';
+                    } else {
+                        finalState = 'OK';
+                    }
+                }
+            }
+            // --------------------------------------------------------------
+
+
+            // 3. Normalize labels for UI (no underscore)
+            const uiState = (finalState === 'NEEDS_WATER') ? 'NEEDS WATER' : finalState;
+
+            // Apply the calculated state to the UI
+            const stateEl = document.getElementById(`${prefix}-state`);
+            stateEl.innerText = uiState;
+            stateEl.className = `status-badge status-${uiState}`;
+
+            // Update Time
+
+            const timeEl = document.getElementById(`${prefix}-time`);
+            if(data.timestamp) {
+                const date = new Date(data.timestamp);
+                timeEl.innerText = date.toLocaleTimeString();
+            } else {
+                timeEl.innerText = 'Unknown';
+            }
+        }
+
+        async function fetchPlant(url, plantId) {
+            const spinner = document.getElementById(`spinner-${plantId}`);
+            // Only show spinner on first load if text is empty, otherwise keep quiet
+            if(document.getElementById(`${plantId === 'plant1' ? 'p1' : 'p2'}-temp`).innerText === '--') {
+                spinner.style.display = 'block';
+            }
+
+            try {
+                // CACHE BUSTING: Add ?t=timestamp to force browser to ignore local cache
+                const bustUrl = `${url}?t=${Date.now()}`;
+                
+                const response = await fetch(bustUrl, {
+                    method: 'GET',
+                    cache: 'no-store' 
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                updateUI(plantId, data);
+            } catch (err) {
+                console.error(`Error fetching ${plantId}:`, err);
+                // Don't wipe the UI on error, just show the error message
+                updateUI(plantId, {}, "Sync Failed"); 
+            }
+        }
+
+        function refreshAll() {
+            fetchPlant(URL_P1, 'plant1');
+            fetchPlant(URL_P2, 'plant2');
+        }
+
+        // Initial Load
+        refreshAll();
+
+        // Auto Refresh
+        setInterval(refreshAll, REFRESH_INTERVAL_MS);
+
+    </script>
+</body>
+</html>
