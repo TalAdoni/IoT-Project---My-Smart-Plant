@@ -1,4 +1,4 @@
-    **🌱 My Smart Plant - IoT Irrigation Monitoring System**
+**🌱 My Smart Plant - IoT Irrigation Monitoring System**
 Course: Internet of Things
 
 Authors: Tal Adoni, Omri Aviram
