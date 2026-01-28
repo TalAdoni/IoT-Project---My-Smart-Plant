@@ -1,91 +1,73 @@
 # My Smart Plant - IoT Irrigation Monitoring System 🌱
-**Course: Internet of Things**
+**Course:** Internet of Things
 
-**Authors: Tal Adoni, Omri Aviram**
+**Authors:**  
+Tal Adoni  
+Omri Aviram
 
-**📖 Overview**
-My Smart Plant is an IoT-based system designed to monitor soil moisture, temperature, and humidity for home plants. The system utilizes an ESP32 microcontroller to collect telemetry data and securely transmit it to the AWS Cloud.
+---
 
-The project demonstrates a full IoT pipeline: from edge sensing and local decision-making to cloud serverless computing, database storage, and real-time visualization via Grafana and Telegram alerts.
+## 📖 Overview
 
-⚠️ Important Note regarding Live Demo / QR Codes: Please note that the QR codes and live dashboard links referenced in the attached presentation are no longer active. The cloud infrastructure (AWS/Grafana) has been decommissioned to avoid incurring further cloud costs after the project's conclusion.
+My Smart Plant is an IoT-based system designed to monitor soil moisture, temperature, and humidity for home plants. The system uses an ESP32 microcontroller to collect telemetry data and securely transmit it to the AWS Cloud.
 
-**⚙️ System Architecture & Workflow**
-The system bridges the physical world (plants) with the digital world (cloud analytics) using the following workflow:
+The project demonstrates a complete IoT pipeline: edge sensing, secure cloud ingestion, serverless processing, time-series storage, visualization, and Telegram notifications.
 
-Edge Layer (ESP32): Reads analog soil moisture data and digital temperature/humidity (DHT22). It performs local state analysis (e.g., turning on an LED if the plant is thirsty) regardless of internet connection.
+---
 
-Communication: Data is sent securely via MQTT (TLS 1.2) to AWS IoT Core.
+## ⚙️ System Architecture & Workflow
 
-Cloud Logic (AWS):
+**Edge Layer (ESP32):**  
+Reads analog soil moisture and DHT22 temperature/humidity data. Performs local state classification and provides immediate LED feedback independent of internet connectivity.
 
-AWS IoT Core: Ingests messages.
+**Communication:**  
+Sensor data is sent securely via MQTT (TLS 1.2) to AWS IoT Core using X.509 certificates.
 
-AWS Lambda: Processes data and triggers alerts.
+**Cloud Logic (AWS):**
+- **AWS IoT Core:** Message ingestion
+- **AWS Lambda:** Data processing and alert triggering
+- **Amazon DynamoDB:** Telemetry storage
+- **Amazon S3 & CloudFront:** Static website hosting for dashboards
 
-DynamoDB: Stores historical telemetry data.
+**Visualization & Alerts:**
+- **QuestDB & Grafana:** Time-series dashboards and analytics
+- **Telegram Bot API:** Sends alerts on threshold breaches
 
-Visualization & Alerts:
+> Note: Upload `workflow_picture.png` to the repo and update its path if included.
 
-QuestDB & Grafana: Used for time-series visualization and dashboards.
+---
 
-Telegram Bot: Sends push notifications to the user's phone when moisture levels drop below a critical threshold.
+## 🔌 Hardware Components
 
-(Make sure to upload your workflow image to the repo and name it workflow_picture.png or update this path)
+- **Microcontroller:** ESP32 Dev Module  
+- **Soil Sensors:** Capacitive Soil Moisture Sensor v2.0 (corrosion resistant)  
+- **Ambient Sensor:** DHT22 (Temperature & Humidity)  
+- **Indicator:** Red LED (status)  
+- **Miscellaneous:** Breadboard, jumper wires
 
-**🔌 Hardware Components**
-Microcontroller: ESP32 Dev Module
+---
 
-Sensors:
+## ☁️ Tech Stack
 
-Capacitive Soil Moisture Sensor v2.0 (Corrosion resistant)
+- **Firmware:** C++ (Arduino Framework)
+- **Cloud Provider:** Amazon Web Services (AWS)
+  - AWS IoT Core
+  - AWS Lambda
+  - Amazon DynamoDB
+  - Amazon S3 & CloudFront
+- **Visualization:** Grafana, QuestDB (time-series)
+- **Notification:** Telegram Bot API
 
-DHT22 (Temperature & Humidity)
+---
 
-Indicators: Red LED (Status indication)
+## 🚀 Key Features
 
-Misc: Breadboard, Jumper wires
+- **Secure Data Ingestion:** X.509 certificates with MQTT over TLS
+- **Local State Indication:** Immediate LED indication when WiFi or cloud is unavailable
+- **Multi-Plant Support:** Multiple plants handled with staggered telemetry
+- **Cost Efficiency:** Designed to run with minimal cloud costs (~$0.60/month)
 
-**☁️ Tech Stack**
-Firmware: C++ (Arduino Framework)
+---
 
-Cloud Provider: Amazon Web Services (AWS)
+## 📂 Project Structure
 
-AWS IoT Core
-
-AWS Lambda
-
-Amazon DynamoDB
-
-Amazon S3
-
-Visualization: Grafana
-
-Database: QuestDB (Time-series)
-
-Notifications: Telegram Bot API
-
-**🚀 Key Features**
-Secure Data Ingestion: Uses X.509 certificates and TLS for secure MQTT communication.
-
-Local Decision Making: The ESP32 indicates plant status via LED immediately, even if WiFi is down.
-
-Scalability: The code supports multiple plants ("Plant 1" and "Plant 2") with staggered data transmission.
-
-Cost Efficiency: Designed to run on minimal cloud resources (approx. $0.60/month for active usage).
-
-**📂 Project Structure**
-/src: Contains the ESP32 source code (.ino or .cpp).
-
-/docs: Project presentation and documentation.
-
-/images: System diagrams and photos.
-
-**📊 Results**
-Real-time monitoring of soil moisture decay over time.
-
-Correlation analysis between ambient temperature and soil drying rates.
-
-Instant alerts sent to mobile devices when watering is required.
-
-Created as part of the IoT Course led by Guy Tel-Zur.
