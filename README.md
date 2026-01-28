@@ -33,8 +33,6 @@ Sensor data is sent securely via MQTT (TLS 1.2) to AWS IoT Core using X.509 cert
 - **QuestDB & Grafana:** Time-series dashboards and analytics
 - **Telegram Bot API:** Sends alerts on threshold breaches
 
-> Note: Upload `workflow_picture.png` to the repo and update its path if included.
-
 ---
 
 ## 🔌 Hardware Components
