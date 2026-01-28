@@ -70,11 +70,11 @@ Sensor data is sent securely via MQTT (TLS 1.2) to AWS IoT Core using X.509 cert
 ---
 
 ## 📂 Project Structure
-/ESP32 code -> ESP32 firmware (.cpp)
-/Cloud services codes -> Python and AWS Lambda scripts
-/Presentation Files -> Files for demo and documentation
-/Site Code and Pictures -> Static dashboards and image assets
-README.md -> This overview
+- ESP32 code -> ESP32 firmware (.cpp)
+- Cloud services codes -> Python and AWS Lambda scripts
+- Presentation Files -> Files for demo and documentation
+- Site Code and Pictures -> Static dashboards and image assets
+- README.md -> This overview
 
 ## 📊 Results
 
