@@ -70,4 +70,17 @@ Sensor data is sent securely via MQTT (TLS 1.2) to AWS IoT Core using X.509 cert
 ---
 
 ## 📂 Project Structure
+/ESP32 code -> ESP32 firmware (.cpp)
+/Cloud services codes -> Python and AWS Lambda scripts
+/Presentation Files -> Files for demo and documentation
+/Site Code and Pictures -> Static dashboards and image assets
+README.md -> This overview
 
+## 📊 Results
+
+- Real-time monitoring of soil moisture and environment
+- Reliable alerting to Telegram on critical moisture levels
+- Visualization via dashboards for individual and combined plants
+- Local analytics via QuestDB + Grafana
+
+*Created as part of the IoT Course led by Dr. Guy Tel-Zur.*
