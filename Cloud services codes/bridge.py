@@ -4,8 +4,7 @@ import requests
 import os
 
 # --- 1. הגדרות ---
-# SECURITY NOTE: Never commit hardcoded keys to GitHub!
-# Use environment variables or a local config file in production.
+
 ACCESS_KEY = os.getenv("AWS_ACCESS_KEY", "YOUR_ACCESS_KEY_HERE")
 SECRET_KEY = os.getenv("AWS_SECRET_KEY", "YOUR_SECRET_KEY_HERE")
 
@@ -101,3 +100,4 @@ while True:
     except Exception as e:
         print(f"Error: {e}")
         time.sleep(10)
+
